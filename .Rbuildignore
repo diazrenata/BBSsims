@@ -1,0 +1,16 @@
+^BBSsize\.Rproj$
+^\.Rproj\.user$
+^\species_data
+^\species_data\*
+^data-raw$
+^LICENSE\.md$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\analysis
+^\analysis\*
+^analysis
+^.github
+^.github\*
+^dat_to_include
+^dat_to_include\*
