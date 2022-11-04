@@ -426,7 +426,7 @@ compare_community_structure <- function(dat) {
 #' @export
 #' @importFrom mclust densityMclust
 fit_gmm <- function(size_vect, max_G = 15) {
-  requireNamespace(mclust)
+  library(mclust)
   this_gmm <- mclust::densityMclust(size_vect, G = c(1:max_G) )
 
   return(this_gmm)
