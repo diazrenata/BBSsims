@@ -19,7 +19,19 @@
     <loc>/reference/add_estimated_sds.html</loc>
   </url>
   <url>
+    <loc>/reference/add_gmm.html</loc>
+  </url>
+  <url>
+    <loc>/reference/all_models_predicted_change.html</loc>
+  </url>
+  <url>
+    <loc>/reference/calc_sv.html</loc>
+  </url>
+  <url>
     <loc>/reference/clean_sp_size_data.html</loc>
+  </url>
+  <url>
+    <loc>/reference/compare_community_structure.html</loc>
   </url>
   <url>
     <loc>/reference/estimate_b.html</loc>
@@ -28,10 +40,28 @@
     <loc>/reference/estimate_sd.html</loc>
   </url>
   <url>
+    <loc>/reference/eval_trend_models.html</loc>
+  </url>
+  <url>
+    <loc>/reference/fit_gmm.html</loc>
+  </url>
+  <url>
+    <loc>/reference/fit_trend_models_biomass.html</loc>
+  </url>
+  <url>
+    <loc>/reference/fit_trend_models_energy.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_annual_state_variables.html</loc>
+  </url>
+  <url>
     <loc>/reference/get_sd_parameters.html</loc>
   </url>
   <url>
     <loc>/reference/get_sp_mean_size.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_years.html</loc>
   </url>
   <url>
     <loc>/reference/granby.html</loc>
@@ -43,19 +73,28 @@
     <loc>/reference/index.html</loc>
   </url>
   <url>
+    <loc>/reference/model_predicted_change.html</loc>
+  </url>
+  <url>
     <loc>/reference/pipe.html</loc>
   </url>
   <url>
+    <loc>/reference/pull_focal_years.html</loc>
+  </url>
+  <url>
+    <loc>/reference/pull_model_aic.html</loc>
+  </url>
+  <url>
     <loc>/reference/raw_masses.html</loc>
+  </url>
+  <url>
+    <loc>/reference/relabund_null_model.html</loc>
   </url>
   <url>
     <loc>/reference/sd_table.html</loc>
   </url>
   <url>
     <loc>/reference/simulate_isd.html</loc>
-  </url>
-  <url>
-    <loc>/reference/simulate_isd_route.html</loc>
   </url>
   <url>
     <loc>/reference/simulate_isd_ts.html</loc>
