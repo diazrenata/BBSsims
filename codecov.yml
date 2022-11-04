@@ -2,7 +2,7 @@ codecov:
   require_ci_to_pass: no
   notify:
     wait_for_ci: false
-  token: 040fa64e-cd06-4cd5-af9b-a90343850566
+  token: 208877ec-dba0-4cad-b552-f0d229b127c0
 
 coverage:
   precision: 2
