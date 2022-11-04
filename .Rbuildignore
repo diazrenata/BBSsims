@@ -1,4 +1,4 @@
-^BBSsize\.Rproj$
+^BBSsims\.Rproj$
 ^\.Rproj\.user$
 ^\species_data
 ^\species_data\*
@@ -14,3 +14,4 @@
 ^.github\*
 ^dat_to_include
 ^dat_to_include\*
+codecov.yml

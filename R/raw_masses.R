@@ -2,13 +2,11 @@
 #'
 #' From Dunning, raw records of mean and (where present) standard deviation for species in the BBS.
 #'
-#' @format A data frame with 895 rows and 21 variables:
+#' @format A data frame with 897 rows and 19 variables:
 #' \describe{
 #'   \item{species_id}{also called aou, species code for BBS}
 #'   \item{id}{species ID column}
 #'   \item{english_common_name}{inherited}
-#'   \item{french_common_name}{inherited}
-#'   \item{spanish_common_name}{inherited}
 #'   \item{sporder}{inherited}
 #'   \item{family}{inherited}
 #'   \item{genus}{Genus}

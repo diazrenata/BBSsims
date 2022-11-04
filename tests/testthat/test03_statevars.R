@@ -55,7 +55,7 @@ test_that("svs on ISD gives expected", {
     dplyr::group_by(year) %>%
     dplyr::summarize(total_mass = sum(mass),
                      total_energy = sum(BBSsims::estimate_b(mass))) %>%
-    ungroup()
+    dplyr::ungroup()
 
   expect_true(all(biomass_sv$total_mass == real_sv$total_biomass))
   expect_true(all(biomass_sv$total_energy == real_sv$total_energy))

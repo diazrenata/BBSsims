@@ -1,23 +1,17 @@
 Package: BBSsims
 Title: Simulate body masses for BBS routes
 Version: 0.0.0.9000
-Authors@R: c(
-    person(c("Renata", "M."), "Diaz",
-        email = "renata.diaz@weecology.org", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0803-4734")))
-Maintainer: Renata Diaz <renata.diaz@weecology.org>
+Authors@R: 
+    person("Redacted", "for Review", , "foo@gmail.com", role = c("aut", "cre"))
+Maintainer: Redacted for review <foo@gmail.com>
 Description: Simulates ISD for BBS data. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
     AICcmodavg,
-    drake,
     dplyr,
-    ggplot2,
-    here,
     mclust,
-    rlang,
-    rmarkdown,
     tidyr,
     magrittr,
     vegan
