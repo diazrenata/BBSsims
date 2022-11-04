@@ -10,20 +10,20 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
+    AICcmodavg,
     drake,
     dplyr,
     ggplot2,
     here,
-    MATSS (>= 0.3.1),
+    mclust,
     rlang,
     rmarkdown,
     tidyr,
-    magrittr
+    magrittr,
+    vegan
 Suggests:
     covr,
     testthat
-Remotes: 
-    weecology/MATSS
 RoxygenNote: 7.2.1
 Depends: 
     R (>= 2.10)

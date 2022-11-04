@@ -5,3 +5,6 @@
 .drake\*
 *isd_data*
 .DS_Store
+^analysis/caches/*
+analysis/caches/*
+analysis\caches\*

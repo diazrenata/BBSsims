@@ -119,30 +119,3 @@ simulate_isd_ts <- function(dataset, sd_dat = NULL, censusyears = NULL, use_th_p
     metadata = dataset$metadata
   ))
 }
-
-#' Simulate the ISD for a BBS route
-#'
-#' Assumes MATSS is installed and working.
-#'
-#' Uses `MATSS::get_bbs_route_region_data` to pull in a dataset and then simulates the ISD for a given year, or all years, for that dataset. Assumes MATSS is installed and working and `MATSS::prepare_bbs_data` has already run.
-#'
-#' @param route which route
-#' @param region which region
-#' @param sd_dat optional, provide dataframe with `id`, `mean_mass`, and `mean_sd`
-#' @param censusyears optional, provide a censusyear or years to use. If not provided returns for all years
-#' @param use_th_pars default FALSE, whether to use sds estimated with Thibault (2010) parameters. Values are very close.
-#' @param isd_seed optional, seed to use when simulating the ISD. If not provided, a seed is randomly chosen and returned with the simulated ISDs.
-#'
-#' @return list of `isd`, `covariates`, and `metadata`
-#' @export
-#'
-#' @importFrom MATSS get_bbs_route_region_data
-simulate_isd_route <- function(route, region, sd_dat = NULL, censusyears = NULL, use_th_pars = F, isd_seed = NULL) {
-
-  routedat <- MATSS::get_bbs_route_region_data(route = route, region = region)
-
-  sim_isd <- simulate_isd_ts(dataset = routedat, sd_dat = sd_dat, censusyears = censusyears, use_th_pars = use_th_pars, isd_seed = isd_seed)
-
-  return(sim_isd)
-
-}

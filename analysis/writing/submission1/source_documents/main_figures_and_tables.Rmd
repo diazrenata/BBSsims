@@ -1,0 +1,518 @@
+---
+output:
+  github_document:
+    df_print: kable
+  # pdf_document: 
+  #   df_print: kable
+csl: ref_template.csl
+bibliography: refs.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, include = T, results = T, message = F, warning = F, eval = T, fig.dim = c(4,4))
+library(dplyr)
+library(drake)
+library(multipanelfigure)
+library(ggplot2)
+library(BBSsims)
+theme_set(theme_bw())
+
+## Set up the cache and config
+db <- DBI::dbConnect(RSQLite::SQLite(), here::here("analysis", "caches", "all.sqlite"))
+cache <- storr::storr_dbi("datatable", "keystable", db)
+cache$del(key = "lock", namespace = "session")
+
+
+```
+
+
+```{r load results and filter to desired temporal coverage}
+
+desired_routes <- read.csv(here::here("analysis", "supporting_data", "ninetypercent_coverage_1988_2018.csv"), stringsAsFactors = F)
+
+loadd(all_sims, cache=cache)
+
+all_sims <- all_sims %>%
+  filter(matssname %in% desired_routes$matssname)
+
+loadd(all_preds_b, cache=cache)
+all_preds_b <- all_preds_b %>%
+  filter(matssname %in% desired_routes$matssname)
+
+loadd(all_aics_b, cache=cache)
+all_aics_b <- all_aics_b %>%
+  filter(matssname %in% desired_routes$matssname)
+
+loadd(all_preds_e, cache=cache)
+all_preds_e <- all_preds_e %>%
+  filter(matssname %in% desired_routes$matssname)
+
+loadd(all_aics_e, cache=cache)
+all_aics_e <- all_aics_e %>%
+  filter(matssname %in% desired_routes$matssname)
+
+loadd(all_cs_compares, cache =cache)
+all_cs_compares <- all_cs_compares %>%
+  filter(matssname %in% desired_routes$matssname)
+
+```
+
+
+# Figure 1. 
+<!-- individuals-driven vs. observed change -->
+
+```{r, include =F}
+
+rn <- "bbs_rtrg_28_4"
+dat <- readd(rn, character_only = T, cache=cache)
+
+dat_obs <- BBSsims:::pull_focal_years(dat)
+dat_null <- BBSsims:::relabund_null_model(dat_obs)
+
+dat_isd_obs <- simulate_isd_ts(dat_obs, isd_seed = 1989)
+dat_isd_null <- simulate_isd_ts(dat_null, isd_seed = 1989)
+
+years <- unique(dat_obs$covariates$year)
+
+begin_years <- years[1:5]
+end_years <- years[(length(years) - 4):length(years)]
+
+begin_isd_real <- filter(dat_isd_obs$isd, year %in% begin_years)
+end_isd_real <- filter(dat_isd_obs$isd, year %in% end_years )
+
+begin_isd_sim <- filter(dat_isd_null$isd, year %in% begin_years)
+end_isd_sim <- filter(dat_isd_null$isd, year %in% end_years)
+
+begin_isd_gmm_real <- add_gmm(begin_isd_real) %>%
+  mutate(time = "begin")
+end_isd_gmm_real <- add_gmm(end_isd_real) %>%
+  mutate(time = "end")
+
+real_gmms <- bind_rows(begin_isd_gmm_real, end_isd_gmm_real) %>%
+  mutate(Dynamics = "Observed")
+
+begin_isd_gmm_sim <- add_gmm(begin_isd_sim) %>%
+  mutate(time = "begin")
+end_isd_gmm_sim <- add_gmm(end_isd_sim)  %>%
+  mutate(time = "end")
+sim_gmms <- bind_rows(begin_isd_gmm_sim, end_isd_gmm_sim) %>%
+  mutate(Dynamics = "Individuals driven")
+
+both_gmms <- bind_rows(real_gmms, sim_gmms) %>%
+  mutate(Time = time)
+```
+
+```{r}
+isd_plots <- ggplot(filter(both_gmms, exp(mass) > 5, exp(mass) < 5000), aes(exp(mass), density, color = Dynamics, linetype = Time)) + 
+  geom_line() + 
+  facet_wrap(vars(Dynamics), ncol = 2, scales = "free_y") + 
+  theme(legend.position = "bottom") + 
+  scale_color_viridis_d(option = "cividis",begin = .2,  end = .8) + 
+  ylab("Probability density")+ 
+  xlab("Mass (g); note log scale") +
+  scale_x_log10()
+
+#isd_plots
+
+```
+
+```{r}
+
+
+dat_dynamics <- filter(all_sims, matssname == rn)
+
+dat_glm <- glm(total_biomass ~ timeperiod * source, data = dat_dynamics, family= Gamma(link = "log"))
+
+dat_lm <- lm(total_biomass ~ timeperiod * source, data = dat_dynamics)
+
+
+dat_dynamics <- dat_dynamics %>%
+  mutate(fitted = predict(dat_glm, type = "response")) %>%
+  mutate(Dynamics = ifelse(source == "sim", "Abundance driven", "Observed")) %>%
+  mutate(time = "begin") 
+
+timeseries_plot <- ggplot(dat_dynamics, aes(timeperiod, total_biomass, color = Dynamics)) +
+  geom_point() + 
+  geom_line() + 
+  geom_line(aes(y = fitted)) + 
+  # geom_rect(aes(xmin = years[1], xmax = years[5], ymin = min(total_biomass), ymax = max(total_biomass), time = "begin"), alpha = 0, color = "black")+ 
+  # geom_rect(data=  mutate(dat_dynamics, time = "end"), aes(xmin = years[length(years) - 4], xmax = years[length(years)], ymin = min(total_biomass), ymax = max(total_biomass),linetype = time), alpha = 0, color = "black")+
+  scale_color_viridis_d(option = "cividis",begin = .2,  end = .8) + 
+  theme(legend.position = "none") +
+  xlab("Year") +
+  ylab("Biomass")
+
+#timeseries_plot
+```
+
+```{r, fig.dim = c(8,6)}
+two_plots <- multi_panel_figure(columns = 1 ,height = c(2,2.25), unit = "in") %>%
+  fill_panel(timeseries_plot) %>%
+  fill_panel(isd_plots)
+
+two_plots
+```
+
+#### Figure 1. 
+
+<!-- Illustration of individuals-driven (null model) dynamics as compared to observed dynamics (A), and the underlying dynamics of the ISD (B) for a sample route (`r dat_isd_obs$metadata$location$routename`, `r dat_isd_obs$metadata$location$regionname`). **A. Dynamics of total biomass.** The gold points show the true values for total biomass in each year, and the blue points show the values for total biomass simulated from a null model that incorporates change in total abundance, but assumes no change in the size structure, over time. The smooth lines show the predicted values from a Gamma (log-link) linear model of the form `total_biomass ~ year * Dynamics`.  For this route, change in the individual size distribution has decoupled the dynamics of biomass from those that would occur due only to changes in abundance. The slope for individuals-driven dynamics is significantly more negative than for the observed dynamics (interaction term p = 0.0013). **B. Underlying changes in the ISD.** The individual size distributions for the first 5 years (solid lines) and last 5 years (dashed lines) of the timeseries. The x-axis is body size (as mass in grams; note log scale) and the y-axis is probability density from a Gaussian mixture model fit to a vector of simulated individual masses for all individuals observed in the years in questions, standardized to sum to 1. For the individuals-driven (blue) scenario, individuals' species identities (which determine their body size estimates) are re-assigned at random weighte by each species' mean relative abundance throughout the timeseries, resulting in a consistent individual size distribution over time. For the observed (gold) scenario, individuals' body sizes are estimated based actual species abundances at each time step. For this route, species composition has shifted over time and produced different ISDs for the "begin" and "end" time periods. Specifically, the "end" ISD has peaks at larger body sizes (ca. 90g and 500g) not present in the "begin" ISD. This redistribution of density towards larger body sizes results in an overall increase in body size community wide, which partially offsets declines in total biomass from those expected given change in abundance alone.  -->
+
+\newpage
+
+```{r process biomass results}
+
+# Select the best-fitting model for each route using AICc (simplest model with an AICc score within two units of the minimum)
+# all_aics contains the AIC and AICc scores for every model fit to each route.
+
+winning_aics <- all_aics_b %>%
+  filter(model_family == "Gamma") %>% # I fit both Gamma and Gaussian models. The Gaussian are easier to interpret (slope terms can be read out directly) but are less strictly appropriate for strictly-positive biomass/energy use data.
+  group_by(matssname, model_family) %>%
+  mutate(minAICc = min(model_AICc)) %>% # identify best AICc
+  mutate(deltaAICc = minAICc - model_AICc)  %>% # deltaAICc is the difference between each model's AICc and the best AICc for that pool
+  filter(deltaAICc > -2) %>% # use 2 as a rule of thumb cutoff 
+  arrange(matssname, modelcomplexity) %>% # rank by model complexity. 1 is simplest, 4 is most complex.
+  mutate(rank = row_number()) %>% 
+  filter(rank == 1) %>% # select the simplest model with deltaAICc within 2 of the best
+  ungroup()
+
+
+# Get predicted changes for winning models
+# all_preds contains predicted trends for all models; the left_join effectively filters to the models in winning_aics.
+winning_fits <- winning_aics %>%
+  left_join(all_preds_b) 
+
+
+# Get changes for winning models *only for routes for which there is some temporal trend*; i.e. the winning model is not the intercept-only model.
+slope_winning_fits <- winning_fits %>%
+  filter(modelcomplexity > 1)
+
+# Pivot longer for plotting and summarizing
+biomass_slopes_long <- slope_winning_fits %>%
+  select(matssname, ratio_sim, ratio_real) %>%
+  tidyr::pivot_longer(-matssname, names_to = "source", values_to = "biomass_ratio") %>%
+  mutate(Dynamics = ifelse(source == "ratio_sim", "Individuals driven", "Observed"))
+
+```
+
+
+```{r process energy results}
+
+
+winning_aics_energy <- all_aics_e %>%
+  filter(model_family == "Gamma") %>% # I fit both Gamma and Gaussian models. The Gaussian are easier to interpret (slope terms can be read out directly) but are less strictly appropriate for strictly-positive biomass/energy use data.
+  group_by(matssname, model_family) %>%
+  mutate(minAICc = min(model_AICc)) %>% # identify best AICc
+  mutate(deltaAICc = minAICc - model_AICc)  %>% # deltaAICc is the difference between each model's AICc and the best AICc for that pool
+  filter(deltaAICc > -2) %>% # use 2 as a rule of thumb cutoff 
+  arrange(matssname, modelcomplexity) %>% # rank by model complexity. 1 is simplest, 4 is most complex.
+  mutate(rank = row_number()) %>% 
+  filter(rank == 1) %>% # select the simplest model with deltaAICc within 2 of the best
+  ungroup()
+
+
+# Get predicted changes for winning models
+# all_preds contains predicted trends for all models; the left_join effectively filters to the models in winning_aics.
+winning_fits_energy <- winning_aics_energy %>%
+  left_join(all_preds_e) 
+
+
+# Get changes for winning models *only for routes for which there is some temporal trend*; i.e. the winning model is not the intercept-only model.
+slope_winning_fits_energy <- winning_fits_energy %>%
+  filter(modelcomplexity > 1)
+
+# Pivot longer for plotting and summarizing
+energy_slopes_long <- slope_winning_fits_energy %>%
+  select(matssname, ratio_sim, ratio_real) %>%
+  tidyr::pivot_longer(-matssname, names_to = "source", values_to = "energy_ratio") %>%
+  mutate(Dynamics = ifelse(source == "ratio_sim", "Individuals driven", "Observed"))
+
+
+# Combine energy and biomass results into one dataframe
+winning_fits_both <- winning_fits %>%
+  mutate(currency = "biomass") %>%
+  bind_rows(mutate(winning_fits_energy, currency = "energy"))
+
+
+```
+
+
+\newpage
+
+# Figure 2. 
+<!-- Directions and magnitudes of change. -->
+
+```{r, fig.dim = c(6,6)}
+
+biomass_slope_histogram <- ggplot(biomass_slopes_long, aes(biomass_ratio, color = Dynamics, fill = Dynamics)) + geom_histogram(boundary = 1) + scale_x_log10() + geom_vline(xintercept = 1) + facet_wrap(vars(Dynamics), scales = "free_y") + scale_color_viridis_d(option = "cividis", begin = .2, end = .8) + scale_fill_viridis_d(option = "cividis", begin = .2, end = .8) +
+  theme(legend.position = "none") + ggtitle("Total biomass") + xlab("")
+
+
+energy_slope_histogram <- ggplot(energy_slopes_long, aes(energy_ratio, color = Dynamics, fill = Dynamics)) + geom_histogram(boundary = 1) + scale_x_log10() + geom_vline(xintercept = 1) + facet_wrap(vars(Dynamics), scales = "free_y") + scale_color_viridis_d(option = "cividis", begin = .2, end = .8) + scale_fill_viridis_d(option = "cividis", begin = .2, end = .8) +
+  theme(legend.position = "bottom") + ggtitle("Total energy use") + xlab("Ratio of last fitted value to first fitted value")
+
+slope_histograms <- multi_panel_figure(columns = 1, height = c(1.6, 2), unit = "in") %>%
+  fill_panel(biomass_slope_histogram) %>%
+  fill_panel(energy_slope_histogram)
+slope_histograms
+```
+
+#### Figure 2
+<!-- . Long-term trends in total biomass and energy use -->
+
+<!-- Histograms showing the direction and magnitude of change over time for the individuals-driven (left) and observed (right) changes in biomass (A) and energy use (B), for communities with a significant slope and/or interaction term (for biomass, 500/739 routes; for energy use, 509/739 routes). Change is summarized as the ratio of the fitted value for the last year in the time series to the fitted value for the first year in the timeseries from the best-fitting model for that community. Values greater than 1 (vertical black line) indicate increases in total energy or biomass over time, and less than 1 indicate decreases. The individuals-driven dynamics (left) reflect the trends fit for the null model, while the observed dynamics (right) reflect trends incorporating both change in total abundance and change in the size structure over time. For communities with no significant interaction term in the best-fitting model, the "individuals-driven" and "observed" ratios will be the same; interaction terms will result in different ratios for "individuals-driven" and "observed" dynamics.  -->
+
+<!-- Among routes with temporal trends, there are qualitatively different continental-wide patterns in individuals-driven and observed dynamics for total biomass and total energy use. 70% of trends in individuals-driven dynamics for energy use are decreasing, and 67% for biomass. However, for biomass, observed dynamics are balanced evenly between increases (49% of routes) and decreases (51%) - indicating that changes in the size structure produce qualitatively different long-term trends for biomass than would be expected given abundance changes alone. However, trends for energy use (which scales nonlinearly with biomass) are dominated by decreases (35% of routes), more closely mirroring the trends expected given changes in abundance.  -->
+
+\newpage
+
+
+# Figure 3. Visualizing decoupling
+
+```{r}
+
+interaction_all_fits <- all_preds_b %>% 
+  # get just the change ratios from the interaction models - regardless of whether the interaction model is the best-fitting model. this is because we want an estimate of the slope, we'll color by model fit in a minute
+  group_by_all() %>% 
+  filter(grepl( "* source",model_formula), model_family == "Gamma") %>%
+  mutate(plus = substr(model_formula, 12,12) == "+") %>% filter(!plus) %>%
+  ungroup() %>%
+  # now join to *winning* formulas to get the best fitting formula
+  left_join(select(winning_fits, matssname, model_formula, modelcomplexity) %>%
+              rename(winning_formula = model_formula)) %>%
+  select(winning_formula, ratio_sim, ratio_real, matssname, modelcomplexity) %>%
+  mutate(currency = "Biomass")
+
+
+interaction_all_fits_energy <- all_preds_e  %>% 
+  # get just the change ratios from the interaction models - regardless of whether the interaction model is the best-fitting model. this is because we want an estimate of the slope, we'll color by model fit in a minute
+  group_by_all() %>% 
+  filter(grepl( "* source",model_formula), model_family == "Gamma") %>%
+  mutate(plus = substr(model_formula, 12,12) == "+") %>% filter(!plus) %>%
+  ungroup() %>%
+  # now join to *winning* formulas to get the best fitting formula
+  left_join(select(winning_fits_energy, matssname, model_formula, modelcomplexity) %>%
+              rename(winning_formula = model_formula)) %>%
+  select(winning_formula, ratio_sim, ratio_real, matssname, modelcomplexity) %>%
+  mutate(currency = "Energy use")
+
+
+all_interaction <- bind_rows(interaction_all_fits, interaction_all_fits_energy) %>%
+  mutate(Syndrome = ifelse(modelcomplexity == 1, "No trend", ifelse(modelcomplexity == 2, "Coupled trend", "Decoupled trends")))
+
+
+```
+
+
+```{r, fig.dim= c(5.5,4)}
+
+decoupling_plot <- ggplot(all_interaction, aes(ratio_sim, ratio_real, color = Syndrome)) + 
+  geom_point(alpha = .5) + 
+  #geom_point(data = filter(all_interaction, winning_formula != "1"), aes(color = winning_formula), alpha = .3) + 
+  scale_y_log10() + 
+  scale_x_log10() + 
+  scale_color_viridis_d(option = "mako", end = .8, direction = -1) + 
+  theme(legend.position = "bottom") + 
+  geom_abline(intercept = 0, slope = 1) + 
+ geom_vline(xintercept = 1, linetype = 2) + 
+  geom_hline(yintercept = 1, linetype =2) +
+  xlab("Individuals-driven change \n Ratio of last fitted value to first fitted value") + 
+  ylab("Observed change \n Ratio of last fitted value to first fitted value") +
+  facet_wrap(vars(currency), ncol = 2)
+
+
+decoupling_plot
+```
+
+
+#### Figure 3
+
+<!-- . Decoupling between individuals-driven and observed trends. -->
+
+<!-- Observed change (ratio of last fitted value to first fitted value, y-axis) in total biomass (left) and total energy use (right) compared to the change expected only due to changes in total abundance (ratio of last fitted value to first fitted value, x-axis). Values greater than 1 (dashed horizontal and vertical lines) mark positive (increasing) trends, while values less than 1 are negative trends. Each point marks the fitted values from a Gamma log-link generalized linear model of the form `response ~ year * dynamics` for a given route. This estimates separate long-term slopes for observed and individuals-driven dynamics. Points are colored corresponding to the best-fitting model (intercept-only, or "no trend"; a slope for year but no difference in slopes between observed and individuals-driven dynamics, or "coupled trend", and separate slopes for observed and individuals-driven dynamics, "decoupled trends") for each route. Deviations from the 1:1 line (solid black line) reflect changes in the community size structure that modulate the relationship between total abundance and total biomass or energy use.  -->
+
+<!-- Changes in total biomass and total energy use generally track changes driven by fluctuations in total abundance, with appreciable scatter around the 1:1 line. When this translates into a statistically detectable decoupling between observed and individuals-driven dynamics ("Decoupled trends"), this is usually in the form of individuals-driven change being more negative (a steeper decline or a smaller increase) than observed change in biomass or energy use (a less steep decline or larger increase), resulting in points falling above and to the left of the 1:1 line. This occurs more strongly and frequently for biomass than for energy use. -->
+
+
+ \newpage
+ 
+# Figure 4
+
+```{r}
+
+
+winning_fits <- winning_fits %>% 
+  left_join(all_cs_compares) %>%
+  mutate(Syndrome = ifelse(modelcomplexity == 1, "No trend", ifelse(modelcomplexity == 2, "Coupled trend", "Decoupled trends")))
+
+
+winning_fits <- winning_fits %>%
+  mutate(categorical_fit = Syndrome) %>%
+  mutate(categorical_fit = as.factor(categorical_fit)) %>%
+  mutate(abs_log_ratio = abs(log(real_end_mean_mass / real_begin_mean_mass)),
+         log_ratio = log(real_end_mean_mass/real_begin_mean_mass)) %>%
+  mutate(isd_turnover = 1 - real_overlap)
+
+isd_mean_change_plot <-  ggplot(winning_fits, aes(abs_log_ratio, color = Syndrome, fill= Syndrome)) + 
+  geom_histogram() + 
+  facet_wrap(vars(Syndrome), scales = 'free_y', ncol = 1) +
+  scale_color_viridis_d(option = "mako", end = .8, direction = -1) +     
+  scale_fill_viridis_d(option = "mako", end = .8, direction = -1) +
+  theme(legend.position = "none") +
+  xlab("Mean mass absolute log ratio") +
+  ylab("Count") +
+  ggtitle("Mean size change")
+# 
+# mean_change_coupled <- filter(winning_fits, modelcomplexity == 2)
+# mean_change_decoupled <- filter(winning_fits, modelcomplexity == 4)
+# mean_change_nt <- filter(winning_fits, modelcomplexity == 1)
+# 
+# ks.test(mean_change_coupled$ratio_real, mean_change_decoupled$ratio_real)
+# 
+# 
+# ks.test(mean_change_coupled$real_overlap, mean_change_decoupled$real_overlap)
+# 
+# ks.test(mean_change_coupled$real_overlap, mean_change_nt$real_overlap)
+# 
+# 
+# ks.test(mean_change_decoupled$real_overlap, mean_change_nt$real_overlap)
+# 
+# ks.test(c(mean_change_nt$real_overlap,mean_change_coupled$real_overlap), mean_change_decoupled$real_overlap)
+
+
+```
+
+```{r}
+
+isd_overlap_plot <- ggplot(winning_fits, aes(isd_turnover,color = Syndrome, fill= Syndrome)) + 
+  geom_histogram() + 
+  facet_wrap(vars(Syndrome), scales = 'free_y', ncol = 1) +
+  scale_color_viridis_d(option = "mako", end = .8, direction = -1) +  scale_fill_viridis_d(option = "mako", end = .8, direction = -1) +
+  theme(legend.position = "none") +
+  xlab("ISD turnover") +
+  ylab("Count") +
+  ggtitle("ISD turnover")
+
+
+
+
+bcd_plot <- ggplot(winning_fits, aes(sp_turnover_bcd,color = Syndrome, fill= Syndrome)) + 
+  geom_histogram() + 
+  facet_wrap(vars(Syndrome), scales = 'free_y', ncol = 1) +
+  scale_color_viridis_d(option = "mako", end = .8, direction = -1) +  scale_fill_viridis_d(option = "mako", end = .8, direction = -1) +
+  theme(legend.position = "none") +
+  xlab("Bray-Curtis index") +
+  ylab("Count") +
+  ggtitle("Species turnover")
+ # isd_overlap_plot
+# 
+# isd_glm <- glm(real_overlap ~ model_formula, family = "binomial", data = winning_fits)
+# #
+# # AIC(isd_glm)
+# # AIC(glm(real_overlap ~ 1, family = "binomial", data = winning_fits))
+# 
+# glm_cor <- cor(predict(isd_glm, type = "response"), isd_glm$model[,1]) ^ 2
+```
+
+```{r, fig.dim = c(8,5)}
+
+isd_change_plots <- multi_panel_figure(columns = 3, rows = 1) %>%
+  fill_panel(isd_mean_change_plot) %>%
+  fill_panel(isd_overlap_plot) %>%
+  fill_panel(bcd_plot)
+isd_change_plots
+```
+
+
+#### Figure 4
+<!-- . Histograms of change in community structure for routes showing no trends, coupled, and decoupled trends in individuals-driven and observed dynamics. -->
+
+<!-- Histograms of (A) change in mean body size from the first to the last five years of monitoring, (B) overall change in the size structure, and (C) change in species composition for routes whose dynamics for  total biomass were best-described using no temporal trend (bottom row; intercept-only model), separate trends for observed and individuals-driven dynamics (middle row), or the same trend for observed and individuals-driven dynamics (top row). Change in mean body size (A) is calculated as the ratio of the mean body size of all individuals observed in the last 5 years of the timeseries relative to the mean body size of all individuals observed in the first 5 years. Overall change in the ISD (B) is calculated as the degree of turnover between the ISDs for the first and last five years of the timeseries (see text). Change in species composition (C) is Bray-Curtis dissimilarity comparing species composition in the first five years to the last five years.  -->
+
+<!-- Routes that exhibit decoupling between observed and individuals-driven changes in total biomass exhibit a high prevalence of increases and decreases in mean body size (middle row, panel A) compared to the changes seen in routes that show either no trend or non-decoupled trends. However, routes with all three signatures of dynamics (coupling, decoupling, or no trend) are not detectably different in the degree of overall change in the ISD or in species composition over time (panels B and C). -->
+
+\newpage
+
+# Tables
+
+<!-- and directions of trends  -->
+
+### Table 1.
+
+```{r model outcomes table, results = T}
+
+model_outcomes_table <- winning_fits_both %>%
+  select(matssname, model_family, model_formula, currency)  %>%
+  group_by(currency, model_formula) %>%
+  summarize(n = dplyr::n()) %>%
+  ungroup() %>%
+  group_by(currency) %>%
+  mutate(nmods = sum(n)) %>%
+  mutate(prop = n / nmods) 
+
+model_outcomes_table_pretty <- model_outcomes_table %>%
+  mutate(currency = ifelse(currency == "biomass", "Total biomass", "Total energy use")) %>%
+  mutate(prop_rounded = round(prop, digits = 2),
+         form_pretty = ifelse(grepl("1", model_formula), "Intercept-only", ifelse(grepl("source", model_formula), "Decoupled trend", "Trend, not decoupled"))) %>%
+  select(currency, form_pretty, n, prop_rounded) %>%
+  rename(`Selected model` = form_pretty,
+         `Number of routes` = n,
+         `Proportion of routes` = prop_rounded,
+         Currency = currency) 
+
+model_outcomes_table_pretty
+
+```
+#### Table 1
+
+Table of the number and proportion of routes whose dynamics for total biomass and total energy use are best described by the following syndromes: no directional change (intercept-only model, biomass ~ 1 or energy use ~ 1); a coupled trend (biomass ~  year or energy use ~ year); or a model with decoupled temporal trends for observed and individuals-driven dynamics (biomass ~ year *  dynamics or energy use ~ year * dynamics, where dynamics refers to observed or null model, individuals-driven dynamics).
+
+31-32% of routes are best described as syndromes of “No directional change” (intercept-only models). For the remaining routes, in most instances, the dynamics of biomass and energy use exhibit a temporal trend, but with no detectable difference in the temporal trends for individuals-driven and observed dynamics (“Coupled trends”). However, for a substantial minority of routes (20% overall for biomass, or 30% of routes with a temporal trend; 7% overall for energy use, or 10% of routes with a temporal trend), there is a detectable deviation between the trends expected due only to changes in abundance and the observed dynamics (“Decoupled trends”).
+
+\newpage
+
+### Table 2.
+
+
+```{r}
+
+slope_winning_fits <- filter(winning_fits_both, modelcomplexity > 1) %>%
+  mutate(abundance_driven_increase = ratio_sim > 1,
+         observed_increase = ratio_real > 1)
+
+slope_winning_fits_summary <- slope_winning_fits %>%
+  group_by(currency) %>%
+  summarize(n_with_slope = dplyr::n(),
+            n_abundance_increase = sum(abundance_driven_increase),
+            n_observed_increase = sum(observed_increase),
+            prop_abundance_increase = round(mean(abundance_driven_increase), digits = 2),
+            prop_observed_increase = round(mean(observed_increase), digits = 2))
+
+slope_winning_fits_pretty <- slope_winning_fits_summary %>%
+  mutate(currency = ifelse(currency == "biomass", "Total biomass", "Total energy use")) %>%
+  select(currency,
+         # n_abundance_increase,
+         # n_observed_increase,
+         prop_abundance_increase,
+         prop_observed_increase,
+         n_with_slope) %>%
+  rename(Currency = currency,
+         # `Number of routes with individuals-driven increase`= n_abundance_increase,
+         # `Number of routes with observed increase`  = n_observed_increase,
+         `Proportion of increasing individuals-driven trends` = prop_abundance_increase,
+         `Proportion of increasing observed trends` = prop_observed_increase,
+         `Number of routes with temporal trends` = n_with_slope)
+
+slope_winning_fits_pretty
+
+```
+
+#### Table 2
+
+The proportion of trends that are increasing (specifically, for which the ratio of the last fitted value to the first fitted value > 1) for individuals-driven and observed dynamics, for routes exhibiting temporal trends (“coupled trends” or “decoupled trends”) in total biomass and total energy use (for biomass, n = 500; for energy use, n = 509). Trends that are not increasing are decreasing.
+
+Trends in individuals-driven dynamics are dominated by declines (67% of routes for total biomass, and 70% of routes for total energy). Observed dynamics for biomass differ qualitatively from the individuals-driven dynamics. Specifically, observed trends in biomass are evenly divided between increases and decreases (49% increasing). Observed trends in energy use more closely mirror individuals-driven trends (65% declines).
+
+
+
+<!-- \newpage -->
+<!-- # References -->

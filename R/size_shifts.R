@@ -28,7 +28,7 @@ pull_focal_years <- function(dataset, keep_years = c(1988:2018)) {
 #' @param resp_seed a seed
 #'
 #' @return df
-#'
+#' @export
 relabund_null_model <- function(dataset, resp_seed = 1989) {
 
   # Compute each species' relative abundance (proportion of total abundance in that year) in each year
