@@ -1,5 +1,5 @@
 library(testthat)
-library(dissBBSsize)
+library(BBSsims)
 test_dir("testthat", reporter = c("check", "progress"))
 
-test_check("dissBBSsize")
+test_check("BBSsims")
