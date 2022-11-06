@@ -17,7 +17,7 @@ working_datasets <- read.csv(here::here("analysis", "supporting_data","eightyper
 
 datasets <- datasets[ which(datasets$target %in% working_datasets$matssname), ]
 
-datasets <- datasets[1:5, ]
+#datasets <- datasets[1:5, ]
 
 methods <- drake_plan(
   annual_svs = target(get_annual_state_variables(dataset),
