@@ -56,9 +56,54 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="bbssize">BBSsize<a class="anchor" aria-label="anchor" href="#bbssize"></a>
+<div class="page-header"><h1 id="bbssims">BBSsims<a class="anchor" aria-label="anchor" href="#bbssims"></a>
 </h1></div>
-<p>R package to simulate individual size data for BBS routes, using the method in <a href="https://doi.org/10.1111/j.1466-8238.2010.00576.x" class="external-link">Thibault et al. 2010 GEB</a>.</p>
+<p>This is a research compendium containing the code, data, and results supporting the manuscript “Shifts in the indivdiual size distribution decouple the long-term dynamics of abundance, biomass, and energy use for North American Breeding Birds”, currently in review.</p>
+<div class="section level2">
+<h2 id="all-use-cases">All use cases<a class="anchor" aria-label="anchor" href="#all-use-cases"></a>
+</h2>
+<p>This repository includes specialized R functions written for this analysis. They are structured as an R package. To use them:</p>
+<ol style="list-style-type: decimal">
+<li>Download this repository to your computer</li>
+<li>Open BBSsims.Rproj in RStudio</li>
+<li>In RStudio’s “Build” pane, click Install</li>
+<li>You may have to update or install package dependencies</li>
+</ol>
+<p>Alternatively, you can open R and run:</p>
+<pre><code><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"diazrenata/BBSsims"</span><span class="op">)</span></span></code></pre>
+<p>You will still have to install or update dependencies.</p>
+</div>
+<div class="section level2">
+<h2 id="to-re-render-the-mansucript-and-supplement">To re-render the mansucript and supplement<a class="anchor" aria-label="anchor" href="#to-re-render-the-mansucript-and-supplement"></a>
+</h2>
+<p>We have provided all materials necessary to re-render the figures and tables from the manuscript and supplements in <code>analysis/writing/submission1/source_documents</code>. To re-render these materials, open the .Rmd documents and re-run them.</p>
+<p>If you would like to explore the final results more fully, we have provided the main results files as .RDS files in <code>analysis/results/foo.RDS</code>. To load these, use:</p>
+<pre><code><span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"analysis"</span>, <span class="st">"results"</span>, <span class="st">"foo.RDS"</span><span class="op">)</span><span class="op">)</span></span></code></pre>
+<p>If you prefer to re-run the full analytical pipeline, use the instructions following.</p>
+</div>
+<div class="section level2">
+<h2 id="to-re-run-the-analyses">To re-run the analyses<a class="anchor" aria-label="anchor" href="#to-re-run-the-analyses"></a>
+</h2>
+<p>Open <code>analysis/pipelines/pipeline.R</code>, select all, and run. If you run the script as written, it will take around 24 hours (using a single core of your computer). If you just want to run the analytical pipeline on a few routes to explore it, uncomment line 20:</p>
+<pre><code><span><span class="co">#datasets &lt;- datasets[1:5, ]</span></span></code></pre>
+<p>to run on just a few routes.</p>
+</div>
+<div class="section level2">
+<h2 id="to-explore-the-final-results">To explore the final results<a class="anchor" aria-label="anchor" href="#to-explore-the-final-results"></a>
+</h2>
+<p>The analysis script will save everything to an .sqlite cache at <code>analysis/caches/all.sqlite</code>. You can load objects into R like this (this will load the major results files):</p>
+<pre><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/drake" class="external-link">drake</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"analysis"</span>, <span class="st">"caches"</span>, <span class="st">"all.sqlite"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">cache</span> <span class="op">&lt;-</span> <span class="fu">storr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/storr/man/storr_dbi.html" class="external-link">storr_dbi</a></span><span class="op">(</span><span class="st">"datatable"</span>, <span class="st">"keystable"</span>, <span class="va">db</span><span class="op">)</span></span>
+<span><span class="va">cache</span><span class="op">$</span><span class="fu">del</span><span class="op">(</span>key <span class="op">=</span> <span class="st">"lock"</span>, namespace <span class="op">=</span> <span class="st">"session"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://docs.ropensci.org/drake/reference/readd.html" class="external-link">loadd</a></span><span class="op">(</span><span class="va">foo</span>, cache <span class="op">=</span> <span class="va">cache</span><span class="op">)</span></span></code></pre>
+<p>If you do not want to rerun the pipeline, you can load the copies we have provided using:</p>
+<pre><code><span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"analysis"</span>, <span class="st">"results"</span>, <span class="st">"foo.RDS"</span><span class="op">)</span><span class="op">)</span></span></code></pre>
+</div>
 </div>
   </div>
 
