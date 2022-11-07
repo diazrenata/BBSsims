@@ -1,5 +1,9 @@
 # BBSsims
 
+
+<!-- badges: start -->
+[![Codecov test coverage](https://codecov.io/gh/diazrenata/BBSsims/branch/main/graph/badge.svg)](https://codecov.io/gh/diazrenata/BBSsims?branch=main)
+
 This is a research compendium containing the code, data, and results supporting the manuscript "Shifts in the indivdiual size distribution decouple the long-term dynamics of abundance, biomass, and energy use for North American Breeding Birds", currently in review.
 
 ## All use cases
