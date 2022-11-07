@@ -1,3 +1,8 @@
-test_that("math works", {
-  expect_true(2 + 2 == 4)
+dat = hartland
+
+test_that("comparing structure works", {
+  str_comp <- compare_community_structure(dat)
+
+
+
 })

@@ -315,7 +315,8 @@ model_predicted_change <- function(one_model) {
 #' @return df
 #' @export
 #'
-#' @importFrom dplyr filter left_join select
+#' @importFrom dplyr filter left_join select mutate group_by_all ungroup group_by summarize
+#' @importFrom tidyr pivot_wider
 #' @importFrom vegan vegdist
 compare_community_structure <- function(dat) {
 
@@ -369,10 +370,10 @@ compare_community_structure <- function(dat) {
   sim_gmms <- left_join(begin_isd_gmm_sim, end_isd_gmm_sim)
 
   sim_overlap <- sim_gmms %>%
-    group_by_all() %>%
-    mutate(minDensity = min(density, density_end)) %>%
-    ungroup() %>%
-    summarize(overlap = sum(minDensity))%>%
+    dplyr::group_by_all() %>%
+   dplyr::mutate(minDensity = min(density, density_end)) %>%
+    dplyr::ungroup() %>%
+    dplyr::summarize(overlap = sum(minDensity))%>%
     dplyr::mutate(turnover = 1 - overlap)
 
   # Calcualte mean mass in first and last 5 year time periods for real and null model
@@ -386,12 +387,12 @@ compare_community_structure <- function(dat) {
   # Create species abundance matrix for first 5/last 5 years and calculate BCD
 
   sp_matrix <- bind_rows(begin_isd_real, end_isd_real) %>%
-    mutate(timeperiod = ifelse(year < 2000, "begin", 'end')) %>%
-    group_by(timeperiod, id) %>%
-    summarize(abund = dplyr::n()) %>%
+    dplyr::mutate(timeperiod = ifelse(year < 2000, "begin", 'end')) %>%
+    dplyr::group_by(timeperiod, id) %>%
+    dplyr::summarize(abund = dplyr::n()) %>%
     tidyr::pivot_wider(id_cols= timeperiod, names_from = id, values_from = abund, values_fill = 0) %>%
-    ungroup() %>%
-    select(-timeperiod) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(-timeperiod) %>%
     as.matrix()
 
   real_bcd <- vegan::vegdist(sp_matrix, "bray")[1]
