@@ -31,27 +31,27 @@ cache$del(key = "lock", namespace = "session")
 desired_routes <- read.csv(here::here("analysis", "supporting_data", "ninetypercent_coverage_1988_2018.csv"), stringsAsFactors = F)
 
 loadd(all_sims, cache=cache)
+loadd(all_preds_b, cache=cache)
+loadd(all_aics_b, cache=cache)
+loadd(all_preds_e, cache=cache)
+loadd(all_aics_e, cache=cache)
+loadd(all_cs_compares, cache =cache)
 
 all_sims <- all_sims %>%
   filter(matssname %in% desired_routes$matssname)
 
-loadd(all_preds_b, cache=cache)
 all_preds_b <- all_preds_b %>%
   filter(matssname %in% desired_routes$matssname)
 
-loadd(all_aics_b, cache=cache)
 all_aics_b <- all_aics_b %>%
   filter(matssname %in% desired_routes$matssname)
 
-loadd(all_preds_e, cache=cache)
 all_preds_e <- all_preds_e %>%
   filter(matssname %in% desired_routes$matssname)
 
-loadd(all_aics_e, cache=cache)
 all_aics_e <- all_aics_e %>%
   filter(matssname %in% desired_routes$matssname)
 
-loadd(all_cs_compares, cache =cache)
 all_cs_compares <- all_cs_compares %>%
   filter(matssname %in% desired_routes$matssname)
 
