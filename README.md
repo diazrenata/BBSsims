@@ -27,11 +27,11 @@ You will still have to install or update dependencies.
 
 We have provided all materials necessary to re-render the figures and tables from the manuscript and supplements in `analysis/writing/submission1/source_documents`. To re-render these materials, open the .Rmd documents and re-run them.
 
-If you would like to explore the final results more fully, we have provided the main results files as .RDS files in  `analysis/results/foo.RDS`. To load these, use:
+If you would like to explore the final results more fully, we have provided the main results files as .RDS files in  `analysis/results/`. To load these, use (substituting in the appropriate file; see `analysis/results/object_descriptions.md` for more):
 
 ```
 
-readRDS(here::here("analysis", "results", "foo.RDS"))
+readRDS(here::here("analysis", "results", "all_sims.RDS"))
 
 ```
 
@@ -52,7 +52,8 @@ to run on just a few routes.
 ## To explore the final results
 
 
-The analysis script will save everything to an .sqlite cache at `analysis/caches/all.sqlite`. You can load objects into R like this (this will load the major results files):
+The analysis script will save everything to an .sqlite cache at `analysis/caches/all.sqlite`. You can load objects into R like this:
+
 
 ```
 library(drake)
@@ -61,16 +62,10 @@ db <- DBI::dbConnect(RSQLite::SQLite(), here::here("analysis", "caches", "all.sq
 cache <- storr::storr_dbi("datatable", "keystable", db)
 cache$del(key = "lock", namespace = "session")
 
-loadd(foo, cache = cache)
+loadd(all_sims, cache = cache)
 
 ```
 
-If you do not want to rerun the pipeline, you can load the copies we have provided using:
-
-```
-
-readRDS(here::here("analysis", "results", "foo.RDS"))
-
-```
+Again,  see `analysis/results/object_descriptions.md` for descriptions of the main results objects.
 
 

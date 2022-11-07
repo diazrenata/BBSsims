@@ -58,10 +58,12 @@ all = bind_rows(datasets, methods)
 
 
 ## Set up the cache and config
-db <- DBI::dbConnect(RSQLite::SQLite(), here::here("analysis", "caches", "all.sqlite"))
+db <- DBI::dbConnect(RSQLite::SQLite(), here::here("analysis", "caches", "all_test.sqlite"))
 cache <- storr::storr_dbi("datatable", "keystable", db)
 cache$del(key = "lock", namespace = "session")
 
 system.time(make(all, cache = cache,  verbose = 1, memory_strategy = "autoclean", lock_envir = F))
 
 # 5 took 1 minute on 1 core
+
+
