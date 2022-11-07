@@ -78,9 +78,9 @@
 <h2 id="to-re-render-the-mansucript-and-supplement">To re-render the mansucript and supplement<a class="anchor" aria-label="anchor" href="#to-re-render-the-mansucript-and-supplement"></a>
 </h2>
 <p>We have provided all materials necessary to re-render the figures and tables from the manuscript and supplements in <code>analysis/writing/submission1/source_documents</code>. To re-render these materials, open the .Rmd documents and re-run them.</p>
-<p>If you would like to explore the final results more fully, we have provided the main results files as .RDS files in <code>analysis/results/foo.RDS</code>. To load these, use:</p>
+<p>If you would like to explore the final results more fully, we have provided the main results files as .RDS files in <code>analysis/results/</code>. To load these, use (substituting in the appropriate file; see <code>analysis/results/object_descriptions.md</code> for more):</p>
 <pre><code><span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"analysis"</span>, <span class="st">"results"</span>, <span class="st">"foo.RDS"</span><span class="op">)</span><span class="op">)</span></span></code></pre>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"analysis"</span>, <span class="st">"results"</span>, <span class="st">"all_sims.RDS"</span><span class="op">)</span><span class="op">)</span></span></code></pre>
 <p>If you prefer to re-run the full analytical pipeline, use the instructions following.</p>
 </div>
 <div class="section level2">
@@ -93,17 +93,15 @@
 <div class="section level2">
 <h2 id="to-explore-the-final-results">To explore the final results<a class="anchor" aria-label="anchor" href="#to-explore-the-final-results"></a>
 </h2>
-<p>The analysis script will save everything to an .sqlite cache at <code>analysis/caches/all.sqlite</code>. You can load objects into R like this (this will load the major results files):</p>
+<p>The analysis script will save everything to an .sqlite cache at <code>analysis/caches/all.sqlite</code>. You can load objects into R like this:</p>
 <pre><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/drake" class="external-link">drake</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"analysis"</span>, <span class="st">"caches"</span>, <span class="st">"all.sqlite"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">cache</span> <span class="op">&lt;-</span> <span class="fu">storr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/storr/man/storr_dbi.html" class="external-link">storr_dbi</a></span><span class="op">(</span><span class="st">"datatable"</span>, <span class="st">"keystable"</span>, <span class="va">db</span><span class="op">)</span></span>
 <span><span class="va">cache</span><span class="op">$</span><span class="fu">del</span><span class="op">(</span>key <span class="op">=</span> <span class="st">"lock"</span>, namespace <span class="op">=</span> <span class="st">"session"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://docs.ropensci.org/drake/reference/readd.html" class="external-link">loadd</a></span><span class="op">(</span><span class="va">foo</span>, cache <span class="op">=</span> <span class="va">cache</span><span class="op">)</span></span></code></pre>
-<p>If you do not want to rerun the pipeline, you can load the copies we have provided using:</p>
-<pre><code><span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"analysis"</span>, <span class="st">"results"</span>, <span class="st">"foo.RDS"</span><span class="op">)</span><span class="op">)</span></span></code></pre>
+<span><span class="fu"><a href="https://docs.ropensci.org/drake/reference/readd.html" class="external-link">loadd</a></span><span class="op">(</span><span class="va">all_sims</span>, cache <span class="op">=</span> <span class="va">cache</span><span class="op">)</span></span></code></pre>
+<p>Again, see <code>analysis/results/object_descriptions.md</code> for descriptions of the main results objects.</p>
 </div>
 </div>
   </div>
