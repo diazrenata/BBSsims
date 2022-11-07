@@ -4,12 +4,12 @@
 \alias{add_estimated_sds}
 \title{Add estimates for SDs}
 \usage{
-add_estimated_sds(clean_size_data, sd_pars = NA)
+add_estimated_sds(clean_size_data, sd_pars)
 }
 \arguments{
 \item{clean_size_data}{cleaned data}
 
-\item{sd_pars}{parameters as list of slope, intercept or NA; NA will use Thibault fit}
+\item{sd_pars}{parameters as list of slope, intercept}
 }
 \value{
 clean_size_data with filled in sds + column to flag if an estimate was added

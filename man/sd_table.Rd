@@ -5,7 +5,7 @@
 \alias{sd_table}
 \title{Means and (estimated) standard deviations of body size for species in the BBS.}
 \format{
-A data frame with 421 rows and 8 variables:
+A data frame with 421 rows and 7 variables:
 \describe{
   \item{species_id}{also called aou, species code for BBS}
   \item{id}{species ID column}
@@ -13,14 +13,13 @@ A data frame with 421 rows and 8 variables:
   \item{species}{Species}
   \item{mean_mass}{Mean mass across all records for that species in Dunning (2008)}
   \item{mean_sd}{Mean standard deviation across all records from Dunning (2008). For records missing a standard deviation, estimated based on the scaling relationship derived from this dataset. Estimated standard deviations are calculated prior to taking species-level means.}
-  \item{contains_estimates}{TRUE/FALSE whether or not the mean_sd and mean_sd_th columns contain include estimated standard deviations}
-  \item{mean_sd_th}{Mean standard deviation, with estimates calculated using the parameters in Thibault (2010)}
+  \item{contains_estimates}{TRUE/FALSE whether or not the mean_sd column contains estimated standard deviations}
 }
 }
 \usage{
 sd_table
 }
 \description{
-A table of the means and estimated standard deviations of body size for species in the BBS dataset based on values in Dunning (2008). Standard deviations, where missing, are estimated based on both the scaling relationship documented in Thibault et al (2010) and re-calculated scaling parameters based on the species present in this expanded dataset. Species-level means are reported for both the mean mean mass and mean standard deviation.
+A table of the means and estimated standard deviations of body size for species in the BBS dataset based on values in Dunning (2008). Standard deviations, where missing, are estimated based on scaling parameters based on the species present in this dataset. Species-level means are reported for both the mean mean mass and mean standard deviation.
 }
 \keyword{datasets}
