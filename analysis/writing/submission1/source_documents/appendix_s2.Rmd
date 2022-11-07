@@ -1,15 +1,14 @@
 ---
-title: Appendix S2
-author: Statistical comparisons of distributions in Figure 4.
+title: "Appendix S2"
+author: "Statistical comparisons of distributions in Figure 4."
 output:
+  html_document:
+    toc: yes
+    df_print: paged
   word_document:
     reference_docx: template_doc.docx
     df_print: kable
-    toc: true
-  # github_document:
-  #   df_print: kable
-  # pdf_document: 
-  #   df_print: kable
+    toc: yes
 csl: ref_template.csl
 bibliography: refs.bib
 ---
