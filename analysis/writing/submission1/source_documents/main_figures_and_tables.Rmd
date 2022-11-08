@@ -1,9 +1,13 @@
 ---
 output:
-  github_document:
+  word_document:
+    reference_docx: template_doc.docx
     df_print: kable
-  # pdf_document: 
+    toc: true
+  # html_document:
   #   df_print: kable
+  pdf_document: 
+    df_print: kable
 csl: ref_template.csl
 bibliography: refs.bib
 ---
@@ -259,9 +263,9 @@ slope_histograms
 #### Figure 2
 <!-- . Long-term trends in total biomass and energy use -->
 
-<!-- Histograms showing the direction and magnitude of change over time for the individuals-driven (left) and observed (right) changes in biomass (A) and energy use (B), for communities with a significant slope and/or interaction term (for biomass, 500/739 routes; for energy use, 509/739 routes). Change is summarized as the ratio of the fitted value for the last year in the time series to the fitted value for the first year in the timeseries from the best-fitting model for that community. Values greater than 1 (vertical black line) indicate increases in total energy or biomass over time, and less than 1 indicate decreases. The individuals-driven dynamics (left) reflect the trends fit for the null model, while the observed dynamics (right) reflect trends incorporating both change in total abundance and change in the size structure over time. For communities with no significant interaction term in the best-fitting model, the "individuals-driven" and "observed" ratios will be the same; interaction terms will result in different ratios for "individuals-driven" and "observed" dynamics.  -->
+<!-- Histograms showing the direction and magnitude of change over time for the individuals-driven (left) and observed (right) changes in biomass (A) and energy use (B), for communities with a significant slope and/or interaction term (for biomass, 501/739 routes; for energy use, 509/739 routes). Change is summarized as the ratio of the fitted value for the last year in the time series to the fitted value for the first year in the timeseries from the best-fitting model for that community. Values greater than 1 (vertical black line) indicate increases in total energy or biomass over time, and less than 1 indicate decreases. The individuals-driven dynamics (left) reflect the trends fit for the null model, while the observed dynamics (right) reflect trends incorporating both change in total abundance and change in the size structure over time. For communities with no significant interaction term in the best-fitting model, the "individuals-driven" and "observed" ratios will be the same; interaction terms will result in different ratios for "individuals-driven" and "observed" dynamics.  -->
 
-<!-- Among routes with temporal trends, there are qualitatively different continental-wide patterns in individuals-driven and observed dynamics for total biomass and total energy use. 70% of trends in individuals-driven dynamics for energy use are decreasing, and 67% for biomass. However, for biomass, observed dynamics are balanced evenly between increases (49% of routes) and decreases (51%) - indicating that changes in the size structure produce qualitatively different long-term trends for biomass than would be expected given abundance changes alone. However, trends for energy use (which scales nonlinearly with biomass) are dominated by decreases (35% of routes), more closely mirroring the trends expected given changes in abundance.  -->
+<!-- Among routes with temporal trends, there are qualitatively different continental-wide patterns in individuals-driven and observed dynamics for total biomass and total energy use. 70% of trends in individuals-driven dynamics for energy use are decreasing, and 67% for biomass. However, for biomass, observed dynamics are balanced evenly between increases (49% of routes) and decreases (51%) - indicating that changes in the size structure produce qualitatively different long-term trends for biomass than would be expected given abundance changes alone. However, trends for energy use (which scales nonlinearly with biomass) are dominated by decreases (65% of routes), more closely mirroring the trends expected given changes in abundance.  -->
 
 \newpage
 
@@ -508,7 +512,7 @@ slope_winning_fits_pretty
 
 #### Table 2
 
-The proportion of trends that are increasing (specifically, for which the ratio of the last fitted value to the first fitted value > 1) for individuals-driven and observed dynamics, for routes exhibiting temporal trends (“coupled trends” or “decoupled trends”) in total biomass and total energy use (for biomass, n = 500; for energy use, n = 509). Trends that are not increasing are decreasing.
+The proportion of trends that are increasing (specifically, for which the ratio of the last fitted value to the first fitted value > 1) for individuals-driven and observed dynamics, for routes exhibiting temporal trends (“coupled trends” or “decoupled trends”) in total biomass and total energy use (for biomass, n = 501; for energy use, n = 509). Trends that are not increasing are decreasing.
 
 Trends in individuals-driven dynamics are dominated by declines (67% of routes for total biomass, and 70% of routes for total energy). Observed dynamics for biomass differ qualitatively from the individuals-driven dynamics. Specifically, observed trends in biomass are evenly divided between increases and decreases (49% increasing). Observed trends in energy use more closely mirror individuals-driven trends (65% declines).
 

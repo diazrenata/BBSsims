@@ -2,9 +2,6 @@
 title: "Appendix S2"
 author: "Statistical comparisons of distributions in Figure 4."
 output:
-  html_document:
-    toc: yes
-    df_print: paged
   word_document:
     reference_docx: template_doc.docx
     df_print: kable
@@ -546,7 +543,7 @@ as.data.frame(mean_mass_lm_emmeans)
 as.data.frame(pairs(mean_mass_lm_emmeans))
 ```
 
-**Appendix S2 Table S3**. Contrasts for absolute log ratio of mean mass, calculated using emmeans [@lenth2021]. There is a significant contrast between routes with decoupled trends and the other two syndromes of dynamics (both contrasts, p < 0.001), but not between routes showing the “no trend” and “coupled trend” syndromes (contrast p = .31).
+**Appendix S2 Table S3**. Contrasts for absolute log ratio of mean mass, calculated using emmeans [@lenth2021]. There is a significant contrast between routes with decoupled trends and the other two syndromes of dynamics (both contrasts, p < 0.001), but not between routes showing the “no trend” and “coupled trend” syndromes (contrast p = .37).
 
 \newpage
 
@@ -562,7 +559,7 @@ anova(overlap_glm, overlap_glm_intercept, test = "Chi")
 
 ```
 
-**Appendix S2 Table S4**. ANOVA table comparing binomial generalized linear models of the form ISD_turnover ~ syndrome and ISD_turnover ~ 1. The model incorporating syndrome is not superior to the intercept-only model (p = .9).
+**Appendix S2 Table S4**. ANOVA table comparing binomial generalized linear models of the form ISD_turnover ~ syndrome and ISD_turnover ~ 1. The model incorporating syndrome is not superior to the intercept-only model (p = .91).
 
 \newpage
 
@@ -579,7 +576,7 @@ anova(bcd_glm, bcd_glm_intercept, test = "Chi")
 
 ```
 
-**Appendix S2 Table S5**. ANOVA table comparing binomial generalized linear models of the form Bray_Curtis_dissimilarity ~ syndrome and Bray_Curtis_dissimilarity ~ 1. The model incorporating syndrome is not superior to the intercept-only model (p = .37).
+**Appendix S2 Table S5**. ANOVA table comparing binomial generalized linear models of the form Bray_Curtis_dissimilarity ~ syndrome and Bray_Curtis_dissimilarity ~ 1. The model incorporating syndrome is not superior to the intercept-only model (p = .36).
 
 
 \newpage
