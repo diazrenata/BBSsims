@@ -2,9 +2,9 @@
 
 
 <!-- badges: start -->
-[![Codecov test coverage](https://codecov.io/gh/diazrenata/BBSsims/branch/main/graph/badge.svg)](https://codecov.io/gh/diazrenata/BBSsims?branch=main)
+[![Codecov test coverage](https://codecov.io/gh/bbssizeshifts/BBSsims/branch/main/graph/badge.svg)](https://codecov.io/gh/bbssizeshifts/BBSsims?branch=main)
 
-This is a research compendium containing the code, data, and results supporting the manuscript "Shifts in the indivdiual size distribution decouple the long-term dynamics of abundance, biomass, and energy use for North American Breeding Birds", currently in review.
+This is a research compendium containing the code, data, and results supporting the manuscript "Temporal changes in the individual size distribution decouple long-term trends in abundance, biomass, and energy use of North American breeding bird communities", currently in review.
 
 ## All use cases
 
@@ -18,7 +18,7 @@ This repository includes specialized R functions written for this analysis. They
 Alternatively, you can open R and run:
 
 ```
-remotes::install_github("diazrenata/BBSsims")
+remotes::install_github("bbssizeshifts/BBSsims")
 ```
 
 You will still have to install or update dependencies. 
